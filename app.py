@@ -1,5 +1,6 @@
 from flask import Flask, request
 import google.generativeai as genai
+import os
 
 # Google Gemini API anahtarınızı buraya girin:
 genai.configure(api_key="AIzaSyBMeBWG1Jg6bKzp2wvK8Bersfm02DJay8w")
@@ -187,5 +188,6 @@ def index():
     '''
 
 if __name__ == '__main__':
-    # Flask sunucusunu başlat
-    app.run(debug=True)
+    # Render için port ayarı
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
