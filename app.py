@@ -178,12 +178,7 @@ def index():
                         <button type="submit">Dizi Öner</button>
                     </form>
                     
-                    {f'''
-                    <div class="response-section">
-                        <h2 class="response-title"> Önerilen Diziler</h2>
-                        <div class="response-content">{response_text}</div>
-                    </div>
-                    ''' if response_text else ''}
+                    {'<div class="response-section"><h2 class="response-title">🎯 Önerilen Diziler</h2><div class="response-content">' + response_text + '</div></div>' if response_text else ''}
                 </div>
             </body>
         </html>
