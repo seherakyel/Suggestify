@@ -1,11 +1,16 @@
 # -*- coding: utf-8 -*-
 
-from flask import Flask, request
+from flask import Flask, request, render_template_string
 import google.generativeai as genai
 import os
 
-# Google Gemini API anahtarınızı buraya girin:
-genai.configure(api_key="AIzaSyBMeBWG1Jg6bKzp2wvK8Bersfm02DJay8w")
+# API anahtarını environment variable'dan al
+api_key = os.getenv('GEMINI_API_KEY')
+if not api_key:
+    raise ValueError("GEMINI_API_KEY environment variable is not set!")
+
+# Gemini API yapılandırması
+genai.configure(api_key=api_key)
 
 # Örnek generation_config ayarları
 generation_config = {
@@ -13,7 +18,6 @@ generation_config = {
     "top_p": 0.95,
     "top_k": 64,
     "max_output_tokens": 8192,
-    "response_mime_type": "text/plain",
 }
 
 # Model nesnesini tanımlıyoruz
@@ -27,21 +31,30 @@ app = Flask(__name__)
 
 @app.route('/', methods=['GET','POST'])
 def index():
+    error_message = ""
     response_text = ""
     
-    # Eğer form POST ile submit edildiyse
-    if request.method == 'POST':
-        # Formdan gelen kullanıcı girişi
-        user_input = request.form.get('dizi_input', '')
+    try:
+        # Eğer form POST ile submit edildiyse
+        if request.method == 'POST':
+            # Formdan gelen kullanıcı girişi
+            user_input = request.form.get('dizi_input', '').strip()
 
-        if user_input:
-            # Gemini API'ye istek atıyoruz
-            response = model.generate_content(
-                f"Sana bir dizi listesi veriyorum: {user_input}\n"
-                "Bana bu dizi listesine göre yeni dizi önerileri sunar mısın?"
-                "Önerileri sadece dizilerin adını yaz, açıklamasını yazma"
-            )
-            response_text = response.text  # Cevabı alıyoruz
+            if user_input:
+                try:
+                    # Gemini API'ye istek atıyoruz
+                    response = model.generate_content(
+                        f"Sana bir dizi listesi veriyorum: {user_input}\n"
+                        "Bana bu dizi listesine göre yeni dizi önerileri sunar mısın?\n"
+                        "Önerileri sadece dizilerin adını yaz, açıklamasını yazma"
+                    )
+                    response_text = response.text
+                except Exception as e:
+                    error_message = "Dizi önerileri alınırken bir hata oluştu. Lütfen tekrar deneyin."
+                    app.logger.error(f"API Error: {str(e)}")
+    except Exception as e:
+        error_message = "Bir hata oluştu. Lütfen tekrar deneyin."
+        app.logger.error(f"Application Error: {str(e)}")
 
     # Modern tasarımlı HTML sayfası
     return f'''
@@ -163,11 +176,22 @@ def index():
                         font-size: 1.5rem;
                         text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
                     }}
+
+                    .error-message {{
+                        background: rgba(255, 99, 71, 0.2);
+                        color: #fff;
+                        padding: 1rem;
+                        border-radius: 10px;
+                        margin-bottom: 1rem;
+                        text-align: center;
+                        border: 1px solid rgba(255, 99, 71, 0.3);
+                    }}
                 </style>
             </head>
             <body>
                 <div class="container">
                     <h1>🎬 Suggestify</h1>
+                    {f'<div class="error-message">{error_message}</div>' if error_message else ''}
                     <form method="post">
                         <div class="form-group">
                             <label for="dizi_input">Sevdiğiniz Dizileri Girin:</label>
