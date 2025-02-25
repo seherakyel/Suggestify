@@ -180,7 +180,7 @@ def index():
                     
                     {f'''
                     <div class="response-section">
-                        <h2 class="response-title">🎯 Önerilen Diziler</h2>
+                        <h2 class="response-title"> Önerilen Diziler</h2>
                         <div class="response-content">{response_text}</div>
                     </div>
                     ''' if response_text else ''}
