@@ -245,6 +245,37 @@ def index():
     series_list = user_data.get('series', [])
     movies_list = user_data.get('movies', [])
     
+    # JavaScript kodunu ayrı bir değişkende tanımla
+    RESPONSE_SCRIPT = '''
+        const responseText = `%s`;
+        const suggestionsDiv = document.getElementById('suggestions');
+        const lines = responseText.split('\\n').filter(line => line.trim());
+        
+        let currentCategory = '';
+        let html = '';
+        
+        lines.forEach(line => {
+            if (line.includes('DİZİLER:') || line.includes('FİLMLER:')) {
+                if (html) html += '</ul>';
+                currentCategory = line.includes('DİZİLER:') ? 'series' : 'movie';
+                html += `<h3>${line}</h3><ul class="suggestions-list">`;
+            } else if (line.trim()) {
+                const itemName = line.replace(/^[-•*]\\s*/, '').trim();
+                html += `
+                    <li>
+                        <span>${itemName}</span>
+                        <button class="action-button add-button" 
+                                onclick="addToList('${currentCategory}', '${itemName}')">
+                            Ekle
+                        </button>
+                    </li>`;
+            }
+        });
+        
+        if (html) html += '</ul>';
+        suggestionsDiv.innerHTML = html;
+    '''
+    
     # HTML Template tanımı
     HTML_TEMPLATE = '''
         <!DOCTYPE html>
@@ -663,12 +694,13 @@ def index():
                     error_message = "Dizi listeniz boş! Lütfen önce listeye dizi ekleyin."
                     return render_template_string(HTML_TEMPLATE, error_message=error_message, response_html="", series_list=series_list, movies_list=movies_list)
                 series_str = ", ".join(series_list)
-                prompt = f"Dizi listemde {series_str} var. Bu dizilere benzer türde 5 dizi önerir misin? Lütfen önerilerini 'DİZİLER:' başlığı altında liste halinde yaz. bana sadece dizi adını yaz,açıklama yazma"
+                prompt = f"Dizi listemde {series_str} var. Bu dizilere benzer türde 10 dizi önerir misin? Lütfen önerilerini 'DİZİLER:' başlığı altında liste halinde yaz. bana sadece dizi adını yaz,açıklama yazma"
 
             response = model.generate_content(prompt)
             response_text = response.text
             
             if response_text:
+                script_content = RESPONSE_SCRIPT % response_text.replace('`', '\\`').replace("'", "\\'")
                 response_html = f'''
                     <div class="response-section">
                         <h2>🎯 Öneriler</h2>
@@ -676,35 +708,7 @@ def index():
                             <div id="suggestions"></div>
                         </div>
                     </div>
-                    <script>
-                        const responseText = `{response_text.replace('`', '\\`').replace("'", "\\'")}`;
-                        const suggestionsDiv = document.getElementById('suggestions');
-                        const lines = responseText.split('\\n').filter(line => line.trim());
-                        
-                        let currentCategory = '';
-                        let html = '';
-                        
-                        lines.forEach(line => {{
-                            if (line.includes('DİZİLER:') || line.includes('FİLMLER:')) {{
-                                if (html) html += '</ul>';
-                                currentCategory = line.includes('DİZİLER:') ? 'series' : 'movie';
-                                html += `<h3>${{line}}</h3><ul class="suggestions-list">`;
-                            }} else if (line.trim()) {{
-                                const itemName = line.replace(/^[-•*]\\s*/, '').trim();
-                                html += `
-                                    <li>
-                                        <span>${{itemName}}</span>
-                                        <button class="action-button add-button" 
-                                                onclick="addToList('${{currentCategory}}', '${{itemName.replace("'", "\\'")}}')">
-                                            Ekle
-                                        </button>
-                                    </li>`;
-                            }}
-                        }});
-                        
-                        if (html) html += '</ul>';
-                        suggestionsDiv.innerHTML = html;
-                    </script>
+                    <script>{script_content}</script>
                 '''
 
         except Exception as e:
