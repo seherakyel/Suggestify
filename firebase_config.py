@@ -1,0 +1,27 @@
+import firebase_admin
+from firebase_admin import credentials, firestore
+
+# Firebase kimlik bilgilerini başlat
+cred = credentials.Certificate({
+
+    
+  "type": "service_account",
+  "project_id": "suggestify-4e3fa",
+  "private_key_id": "e4ec398f2e3b58f0b504d6df09995806d3eaa660",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC0jBMuV8AKJRNi\n0tvoH3OFM1C+/icglXjSryDuo7LRH4aFViSSqxlno2i0DDvyll64g0KRn2mco3b3\n4ctsbkIwJv+Bwwe4UqL/WoacGKHWpOSDAQa8XyBTTJn02FZ7BKSACxAYLla0D4u8\nR6tqteTIkaKYqET0wcuzuDz5KUd+Oomj/uxJLDbAhsVvo32po0TOVqWJJ5RfZCZC\nnj3/bYScOovhrOVn2ibAEhCS4P/u9Ap+yoOu+Ku3jyoLlcDdPS1biVs+7H0lZURR\ngRRTYeWxLCRPyiC+WIgiyp3sH4qau8HDh86yfIRRNFzUegl3HH0ktg0k5pNx13hR\nCpqwweBRAgMBAAECggEALYz7l+EWt9iDzBaD2cv5kr0QHae0inF7orgBeIO/bShl\ngYVqw8A8MBwXoflGNJ2Ad0/Sfzf3ZsgND1wdvRUSSODF7OCeNYBP1FnsBTzns+Y1\nKuIa53KejrWQUCg2pWHV+OIRpPAn+tTDPfTdCBatCndHzPkDMLcmJAkTBQ/HlE5W\nEzh5cBKBKIDh6XgKf0ualtqBRGmDHD2Xz4dj4NMOnxn8xFab8fdWTlZG//XpcGS5\nJIlHw6F51ngJRToXXT1tZP+Um20w3f2FLnKEGTxErKh5Vu2E8UjVBFPDPC0/rYNh\nxiSx/q6FKG/f5GeXdn3ZRyrhsijnW0mW+gA4tqQ9UwKBgQD1kx7K764Awu9lpyEh\nYVGTxNkD989UYrhS2z6JrwGFQtT16L2t5Pd32KpuhekTitEG+hFBsvzYZBbHDaa2\nw5DjiR4bAHJveRfSBdF75QO0l4NRQ5uuh3f/WDbu+/vMmShtLNfXMxAkN6hjeVOc\nqUPwaoUSdy+Pp24A3HvJoAeuywKBgQC8Nj4P1IEsGs6Cd4ryOl4YVMJBtRkOgAgc\nL7u+QDJo/Fnz2txujSdoNPTubmcnOo4lcefRS1ZCyZUkaglhyiQlbkrOHtFPTzrD\nisJ71J5GwwP6s1P0hziAuOoZedn4EfyAIDS0zMJ0UiqyyfngGGX9C//2fWY7sDNR\nuuiXGZWN0wKBgDfjYpem0n/j3V3SGm0hW9J4czc+95Vp3i8lLGdjR8JPQm4wqLJh\nsJw62BbNLQ1Ag2/GC5VbKcYJiVGF3tIrUdcmxo44nNKXyX8HyfQbW6uG6+DbtRuU\nQw/+wInFGTooBRZLpVeZjGvhqtXwr8GwmACoDV71dwKHhTZ290kcvYLfAoGBALRd\nswoOlx+CLQdAsmpB3yyoBWVcvL91mNASOnQvJ2AO/dFAm2BiazJlFZhtOvOQHOrr\nhsG+1dK5RfEYoRcS1aL9WDjBtcqwXdtI3eo3rtqXRvf45OsArvhEvSte57Dg476R\nnpDpbSx2Fa8y+gB0wUBIQKqiL9fhmrynRwCOpxC7AoGBALl6mz6YF82nAodDRWgI\nWqALGtbVns58uwQkKpJz137H8biMg6fX8f/XgDJrSLFi/AAksw4DlO8CUzp/FVjl\nejGqAp2oEO1QXaUnSqfkoE+ESO/BCLgAE2zisqJhlreON3k+ihjdxTHc3O244xLS\nIRaa+RdaeMynSBz3Ksbbh4wR\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-fbsvc@suggestify-4e3fa.iam.gserviceaccount.com",
+  "client_id": "115579087384654615715",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fbsvc%40suggestify-4e3fa.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+
+  # Firebase'den aldığınız cert URL
+})
+
+# Firebase uygulamasını başlat
+firebase_admin.initialize_app(cred)
+
+# Firestore veritabanı bağlantısını al
+db = firestore.client() 
